@@ -253,8 +253,8 @@ public class GivenBlackBox {
         assertNotNull(bears);
 
         Bear baseBear1 = new Bear(Stuffing.stuffing.BASE); // $31
-        Bear baseBear2 = new Bear(Stuffing.stuffing.BASE); // $31
-        Bear baseBear3 = new Bear(Stuffing.stuffing.BASE); // $31
+        Bear baseBear2 = new Bear(Stuffing.stuffing.DOWN); // $31
+        Bear baseBear3 = new Bear(Stuffing.stuffing.FOAM); // $31
         baseBear1.clothing.add(new Clothing(15, "Custom Cloth"));
 
         bears.addBear(baseBear1);
