@@ -217,9 +217,83 @@ public class BearWorkshop implements BearWorkshopInterface{
      * @return the savings if the customer would check with the current bears in the workshop out as double
      */
     public double calculateSavings() {
-        System.out.println("TODO: Implement me in Assignment 3");
-        return 0.0;
+        double rawCost = 0.0D;
+
+        Bear bear;
+        for(Iterator<Bear> val = this.BearCart.iterator(); val.hasNext(); rawCost += getRawCost(bear)) {
+            bear = val.next();
+            bear.price = 0.0D;
+        }
+
+        double cost = 0.0D;
+
+        for(Iterator<Bear> val = this.BearCart.iterator(); val.hasNext(); cost += getTheCost(bear)) {
+            bear = val.next();
+        }
+
+        double savings = rawCost - cost;
+        Collections.sort(this.BearCart);
+        LinkedList<Bear> nonFreeBears = new LinkedList<>();
+        int counter = 0;
+        double discountedCost = 0.0D;
+
+        for (Bear value : this.BearCart) {
+            bear = value;
+            ++counter;
+            if (counter % 3 == 0) {
+                Bear freeBear = nonFreeBears.remove();
+                discountedCost -= this.getCost(freeBear);
+            }
+            discountedCost += this.getCost(bear);
+            nonFreeBears.add(bear);
+        }
+
+        savings += cost - discountedCost;
+        double accessorySavings = 0.0D;
+
+        for (Bear nonFreeBear : nonFreeBears) {
+            bear = nonFreeBear;
+            int numOfFreeClothes = bear.clothing.size() / 3;
+            int numOfAccessories = bear.clothing.size() - numOfFreeClothes;
+            numOfAccessories += bear.noisemakers.size();
+            if (numOfAccessories > 9) {
+                accessorySavings += this.getCost(bear) * 0.1D;
+            }
+        }
+
+        return accessorySavings + savings;
     }
-    
- 
+
+    private double getTheCost(Bear bear) {
+        bear.price = 0.0D;
+        double cost = this.getRawCost(bear);
+        Collections.sort(bear.clothing);
+        int numFree = bear.clothing.size() / 3;
+        ArrayList<Clothing> freeClothes = new ArrayList<>();
+
+        for(int i = bear.clothing.size() - 1; i >= 0; --i) {
+            Clothing clothes = bear.clothing.get(i);
+            if (i > bear.clothing.size() - numFree - 1) {
+                freeClothes.add(clothes);
+            } else {
+                bear.price += clothes.price;
+            }
+        }
+
+        NoiseMaker noise;
+        for(Iterator<NoiseMaker> val = bear.noisemakers.iterator(); val.hasNext(); bear.price += noise.price) {
+            noise = val.next();
+        }
+
+        bear.price += (double)bear.stuff.price;
+        bear.price += bear.casing.priceModifier;
+        bear.price += bear.ink.price;
+        if (cost > 70.0D) {
+            bear.price -= bear.ink.price;
+        }
+
+        return bear.price;
+    }
+
+
 }
