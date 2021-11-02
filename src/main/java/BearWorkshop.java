@@ -1,8 +1,20 @@
+/**
+ File: BearWorkshop.java
+ Author:   charlesersk
+ Date: 11/2/2021
+
+ Description: This class provides functionality for a BearWorkshop class.
+ */
+
 package main.java;
 
 import java.util.*;
 
-// This class provides functionality for a BearWorkshop class.
+/**
+ Class: BearWorkshop
+
+ Description: This class provides functionality for a BearWorkshop class.
+ */
 public class BearWorkshop implements BearWorkshopInterface{
     // Workshop has a collection of bears
     // Workshop has a customer
