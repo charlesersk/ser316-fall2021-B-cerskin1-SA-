@@ -202,9 +202,10 @@ public class BearWorkshop implements BearWorkshopInterface{
 
         for (int count = 0; count <= numberOfFreeBearsInBearCart; ++count) {
             for (Bear bear : BearCart) {
-                if (freeBear != null && bear.price < freeBear.price)
+                if (freeBear != null && bear.price < freeBear.price) {
                     freeBear = bear;
                     temp += temp - temp * 2 + bear.price;
+                }
 
             }
         }
