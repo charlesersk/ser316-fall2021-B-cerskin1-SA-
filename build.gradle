@@ -15,7 +15,7 @@ repositories {
     jcenter()
 }
 
-test {
+test{
 exclude ’**/GivenBlackBox.class’
 }
 
@@ -30,16 +30,16 @@ dependencies {
 // Configure Checkstyle
 /////////////////////////////////////////////////////////////////////
 apply plugin: 'checkstyle'
- checkstyle {
- Keep checkstyle a little quieter
-  ignoreFailures = true
-  showViolations = false
- }
+   checkstyle {
+   Keep checkstyle a little quieter
+   ignoreFailures = true
+   showViolations = false
+   }
 
  tasks.withType(Checkstyle) {
   reports {
-    html.enabled = true
-    xml.enabled = false
+   html.enabled = true
+   xml.enabled = false
   }
  }
 checkstyle {
