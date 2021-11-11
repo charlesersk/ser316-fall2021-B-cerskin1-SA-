@@ -19,6 +19,7 @@ test {
 exclude ’**/GivenBlackBox.class’
 }
 
+
 // In this section you declare the dependencies for your production and test code
 dependencies {
     compile "junit:junit:4.12"
