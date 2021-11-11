@@ -31,39 +31,40 @@ public class BearWorkshop implements BearWorkshopInterface{
      * accessory discounts into account correctly. 
      * @param bear to get cost of
      * @return double representation of bear cost
-     * TODO: test me and fix me in assignment 3
      */
     @Override
     public double getCost(Bear bear) {
+        bear.price = 0.0D;
+        double cost = this.getRawCost(bear);
         Collections.sort(bear.clothing);
         int numFree = bear.clothing.size() / 3;
         ArrayList<Clothing> freeClothes = new ArrayList<>();
 
-        for (int i = 0; i < bear.clothing.size(); i++) {
+        for(int i = bear.clothing.size() - 1; i >= 0; --i) {
             Clothing clothes = bear.clothing.get(i);
-            if (i < numFree) {
+            if (i > bear.clothing.size() - numFree - 1) {
                 freeClothes.add(clothes);
             } else {
                 bear.price += clothes.price;
             }
         }
 
-        for (NoiseMaker noise: bear.noisemakers) {
-            bear.price += noise.price;
+        NoiseMaker noise;
+        for(Iterator<NoiseMaker> val = bear.noisemakers.iterator(); val.hasNext(); bear.price += noise.price) {
+            noise = val.next();
         }
 
-        if (bear.ink != null) {
-            bear.price += bear.ink.price;
-        }
-
-        bear.price += bear.stuff.price;
+        bear.price += (double)bear.stuff.price;
         bear.price += bear.casing.priceModifier;
+        bear.price += bear.ink.price;
+        if (cost > 70.0D) {
+            bear.price -= bear.ink.price;
+        }
 
         return bear.price;
     }
 
     // Function to get the raw cost of a bear without any discounts
-   // TODO: test me and fix me in assignment 3
     public double getRawCost(Bear bear) {
         for (int i = 0; i < bear.clothing.size(); i++) {
             Clothing clothes = bear.clothing.get(i);
@@ -91,7 +92,7 @@ public class BearWorkshop implements BearWorkshopInterface{
      * Utility method to calculate tax for purchases by customers in different
      * states.
      * You can assume these taxes are what we want, so they are not wrong.
-     * @return
+     * @return calculatedTax
      */
     public double calculateTax() {
         double tax;
@@ -122,83 +123,39 @@ public class BearWorkshop implements BearWorkshopInterface{
      * Utility method to add a bear to the BearFactory - so ti the shopping cart.
      * @param bear to add
      * @return true if successful, false otherwise
-     * TODO: test me and fix me in assignment 3
      */
     @Override
     public boolean addBear(Bear bear)       {
-        if (this.BearCart.add(bear))        {
-            return true;
-                                            }
-        else                                {
-            return false;
-                                            }
+        return this.BearCart.add(bear);
     }
 
     // Simple means to remove a bear from the shopping cart
     @Override
-    public boolean removeBear(Bear bear)    {
-        if (this.BearCart.remove(bear))     {
-            return true;
-                                            }
-        else                                {
-            return false;
-                                            }
+    public boolean removeBear(Bear bear) {
+        return this.BearCart.remove(bear);
     }
 
     /**
      * This is a function to allow customers to checkout their shopping cart
-     * It should return the total cost of they purchase. 
-     * TODO: Test me and fix me in assignment 3
-     * @return
+     * It should return the total cost of they purchase.
+     * @return purchaseAmount
      */
     @Override
     public double checkout() {
         if (this.customer.age <= 13) {
-            if (this.customer.parent.age < 18)
+            if (this.customer.parent == null || this.customer.parent.age < 18) {
                 System.out.println("Guardian is too young");
                 return -1;
-        }
-        double temp = 0;
-        Double Cost = Double.valueOf(0.00);
-        for (Bear bear: BearCart) {
-            Cost = Cost + getRawCost(bear);
-        }
-        for (Bear bear: this.BearCart) {
-            temp += getCost(bear);
-        }
-
-
-        double savings = 0;
-        // calculate total cost
-        double rawCost = 0;
-        for (Bear bear: BearCart) {
-            rawCost += this.getRawCost(bear);
-        }
-
-        // calculate adjusted cost
-        double cost = 0;
-        for (Bear bear: this.BearCart) {
-            cost += this.getCost(bear);
-        }
-        savings += rawCost - cost; // calc delta between raw and prorated cost
-
-        List<Bear> nonFreeBears = new LinkedList<>();
-        int counter = 0;
-        int numberOfFreeBearsInBearCart = BearCart.size() / 3;
-        double discountedCost = 0;
-        Bear freeBear = null;
-
-        for (int count = 0; count <= numberOfFreeBearsInBearCart; ++count) {
-            for (Bear bear : BearCart) {
-                if (freeBear != null && bear.price < freeBear.price)
-                    freeBear = bear;
-                    temp += temp - temp * 2 + bear.price;
-
             }
         }
-        cost = temp;
+        double rawCost = 0.0D;
 
-        return cost * calculateTax();
+        Bear bear;
+        for(Iterator var3 = this.BearCart.iterator(); var3.hasNext(); rawCost += this.getRawCost(bear)) {
+            bear = (Bear)var3.next();
+        }
+
+        return (rawCost - this.calculateSavings()) * calculateTax();
     }
 
 
@@ -217,9 +174,54 @@ public class BearWorkshop implements BearWorkshopInterface{
      * @return the savings if the customer would check with the current bears in the workshop out as double
      */
     public double calculateSavings() {
-        System.out.println("TODO: Implement me in Assignment 3");
-        return 0.0;
+        double rawCost = 0.0D;
+
+        Bear bear;
+        for(Iterator<Bear> val = this.BearCart.iterator(); val.hasNext(); rawCost += getRawCost(bear)) {
+            bear = val.next();
+            bear.price = 0.0D;
+        }
+
+        double cost = 0.0D;
+
+        for(Iterator<Bear> val = this.BearCart.iterator(); val.hasNext(); cost += getCost(bear)) {
+            bear = val.next();
+        }
+
+        double savings = rawCost - cost;
+        Collections.sort(this.BearCart);
+        LinkedList<Bear> nonFreeBears = new LinkedList<>();
+        int counter = 0;
+        double discountedCost = 0.0D;
+
+        for (Bear value : this.BearCart) {
+            bear = value;
+            ++counter;
+            if (counter % 3 == 0) {
+                Bear freeBear = nonFreeBears.remove();
+                discountedCost -= this.getCost(freeBear);
+            }
+            discountedCost += this.getCost(bear);
+            nonFreeBears.add(bear);
+        }
+
+        savings += cost - discountedCost;
+        double accessorySavings = 0.0D;
+
+        for (Bear nonFreeBear : nonFreeBears) {
+            bear = nonFreeBear;
+            int numOfFreeClothes = bear.clothing.size() / 3;
+            int numOfAccessories = bear.clothing.size() - numOfFreeClothes;
+            numOfAccessories += bear.noisemakers.size();
+            if (numOfAccessories > 9) {
+                accessorySavings += this.getCost(bear) * 0.1D;
+            }
+        }
+
+        return accessorySavings + savings;
     }
-    
- 
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 }
